@@ -1,0 +1,25 @@
+{
+  "commands": [
+    {
+      "name": "echo",
+      "description": "Echo whatever text after command",
+      "usage": "$echo Hello World",
+      "function": "execute_echo",
+      "arguments": ["text"]
+    },
+    {
+      "name": "help",
+      "description": "Shows usage text of command requested",
+      "usage": "$help <command>",
+      "function": "execute_help",
+      "arguments": ["command"]
+    },
+    {
+      "name": "clear",
+      "description": "Clear out all previous command messages",
+      "usage": "$clear",
+      "function": "execute_clear",
+      "arguments": []
+    }
+  ]
+}
