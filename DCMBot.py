@@ -190,6 +190,8 @@ async def rm(ctx, *args):
 @discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def catgirl(ctx, *args):
     try: 
+        await ctx.message.delete()
+        
         r = requests.get("https://nekos.moe/api/v1/random/image")
         if r.status_code == 200: 
             image_id = r.json()["images"][0]["id"]
