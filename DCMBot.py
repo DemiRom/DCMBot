@@ -252,6 +252,24 @@ async def waifu(ctx, *args):
     except Exception as e: 
         print(e)
 
+@bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
+async def jesus(ctx, *args): 
+    try: 
+        await ctx.message.delete()
+        
+        r = requests.get("https://bible-api.com/data/web/random")
+
+        if r.status_code == 200: 
+            text = r.json()["random_verse"]["text"]
+            await ctx.send(text)
+
+        else: 
+            await ctx.send("Couldn't fetch your jesus quote :(", delete_after=DELETE_TIMEOUT)
+    except discord.HTTPException as e:
+        print(f"An error occurred while trying to delete messages: {e}")
+    except Exception as e: 
+        print(e)
 
 @bot.command()
 @discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
