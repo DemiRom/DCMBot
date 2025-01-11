@@ -6,13 +6,15 @@ import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=True)
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 PREFIX = os.getenv('DISCORD_PREFIX')
+MAX_DELETE = os.getenv('DISCORD_MAX_DELETE')
 
 assert TOKEN is not None or TOKEN != ""
 assert PREFIX is not None or PREFIX != ""  
+assert MAX_DELETE is not None or MAX_DELETE != "" 
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -21,6 +23,13 @@ bot = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 def is_me(m): 
     return m.author == bot.user
+
+async def print_cowsay_help(ctx): 
+    await ctx.send(embed=discord.Embed(
+        title=f"Usage: {PREFIX}cowsay <text>",
+        description="Draws a pretty picture of a cow with text",
+        color=discord.Color.blue()
+    ), delete_after=25)
 
 async def delete_by_emoji(ctx, args): 
     messages = []
@@ -153,6 +162,32 @@ async def rm(ctx, *args):
     except discord.HTTPException as e:
         print(f"An error occurred while trying to delete messages: {e}")
 
+@bot.command()
+async def cowsay(ctx, *args): 
+    try: 
+        await ctx.message.delete()
+
+        if not args: 
+            await print_cowsay_help(ctx)
+            return
+        
+        text = " ".join(args)
+        header = "_"*(len(text)+4)
+        footer = "-"*(len(text)+4)
+        spaces = " "*(len(text)+4)
+
+        await ctx.send(f'''```
+        {header} 
+        < {text} >  
+        {footer} 
+        {spaces}\\ 
+        {spaces}\\   ^__^  
+        {spaces}\\  (oo)\\_______
+        {spaces}    (__)\\       )\\/\\
+        {spaces}        ||----w |
+        {spaces}        ||     ||```''')
+    except Exception as e: 
+        print(e)
 
 if __name__ == "__main__":
     bot.run(TOKEN)

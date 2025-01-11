@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-load_dotenv()
+load_dotenv(override=True)
 
 ROOT_DIR = os.getenv('ROOT_DIR')
 
