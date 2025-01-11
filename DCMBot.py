@@ -1,6 +1,7 @@
 import os
 import discord
 import asyncio
+import requests
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -46,7 +47,7 @@ async def print_cowsay_help(ctx):
         title=f"Usage: {PREFIX}cowsay <text>",
         description="Draws a pretty picture of a cow with text",
         color=discord.Color.blue()
-    ), delete_after=25)
+    ), delete_after=HELP_DELETE_TIMEOUT)
 
 async def delete_by_emoji(ctx, args): 
     messages = []
@@ -101,7 +102,7 @@ async def print_rm_help(ctx):
         .add_field(name="Delete By Count", value="rm -c <count>\n\nDeletes any number of messages up to the configured limit starting with the newest ones!\n", inline=False)
         .add_field(name="Delete By Username", value="rm -u @<user> <count>\n\nDeletes any number of messages up to the configured limit starting with the newest ones from a specific user!\n", inline=False)
 
-        , delete_after=25)
+        , delete_after=HELP_DELETE_TIMEOUT)
 
 @bot.event
 async def on_ready():
@@ -115,9 +116,9 @@ async def on_ready():
 async def clear(ctx): 
     try: 
         deleted_msgs = await ctx.channel.purge(limit=MAX_DELETE) # TODO send this to a log file / audit file
-        await ctx.send(f"Deleted {len(deleted_msgs)} messages.", delete_after=5)
+        await ctx.send(f"Deleted {len(deleted_msgs)} messages.", delete_after=DELETE_TIMEOUT)
     except discord.Forbidden:
-        await ctx.send("I don't have permission to delete messages in this channel.", delete_after=5)
+        await ctx.send("I don't have permission to delete messages in this channel.", delete_after=DELETE_TIMEOUT)
     except discord.HTTPException as e:
         print(f"An error occurred while trying to delete messages: {e}")
 
@@ -178,12 +179,43 @@ async def rm(ctx, *args):
             return
 
         # TODO Dump deleted messages into a log file
-        await ctx.send(f"Deleted {len(messages)} messages!", delete_after=5)
+        await ctx.send(f"Deleted {len(messages)} messages!", delete_after=DELETE_TIMEOUT)
 
     except discord.Forbidden:
-        await ctx.send("I don't have permission to delete messages in this channel.", delete_after=5)
+        await ctx.send("I don't have permission to delete messages in this channel.", delete_after=DELETE_TIMEOUT)
     except discord.HTTPException as e:
         print(f"An error occurred while trying to delete messages: {e}")
+
+@bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
+async def catgirl(ctx, *args):
+    try: 
+        r = requests.get("https://nekos.moe/api/v1/random/image")
+        if r.status_code == 200: 
+            image_id = r.json()["images"][0]["id"]
+
+            image_request = requests.get(f"https://nekos.moe/image/{image_id}")
+            
+            if image_request.status_code != 200: 
+                await ctx.send("Couldn't fetch your catgirls image :'(", delete_after=DELETE_TIMEOUT)
+                return
+            
+            assert image_request.content is not None
+
+            with open("catgirl.png", "wb") as f: 
+                f.write(image_request.content)
+
+            await ctx.send(file=discord.File("catgirl.png"))
+
+            if os.path.exists("catgirl.png"): 
+                os.remove("catgirl.png")
+
+        else: 
+            await ctx.send("Couldn't fetch your catgirl :(", delete_after=DELETE_TIMEOUT)
+    except discord.HTTPException as e:
+        print(f"An error occurred while trying to delete messages: {e}")
+    except Exception as e: 
+        print(e)
 
 @bot.command()
 @discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
