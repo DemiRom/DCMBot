@@ -191,8 +191,7 @@ async def rm(ctx, *args):
 async def catgirl(ctx, *args):
     try: 
         await ctx.message.delete()
-        
-        r = requests.get("https://nekos.moe/api/v1/random/image")
+        r = requests.get("https://nekos.moe/api/v1/random/image", params={"nsfw": "true" if args and args[0] == "nsfw" else "false", "count": 1})
         if r.status_code == 200: 
             image_id = r.json()["images"][0]["id"]
 
