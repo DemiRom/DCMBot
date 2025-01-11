@@ -2,24 +2,39 @@ import os
 import discord
 import asyncio
 
-# from CommandParser import CommandParser
 from discord.ext import commands
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
 
+load_dotenv(override=True)
 TOKEN = os.getenv('DISCORD_TOKEN')
 PREFIX = os.getenv('DISCORD_PREFIX')
 MAX_DELETE = os.getenv('DISCORD_MAX_DELETE')
-
-assert TOKEN is not None or TOKEN != ""
-assert PREFIX is not None or PREFIX != ""  
-assert MAX_DELETE is not None or MAX_DELETE != "" 
+DELETE_TIMEOUT= os.getenv('DELETE_TIMEOUT')
+HELP_DELETE_TIMEOUT= os.getenv('HELP_DELETE_TIMEOUT')
 
 intents = discord.Intents.default()
 intents.message_content = True
-
 bot = commands.Bot(command_prefix=PREFIX, intents=intents)
+
+def init():
+    global MAX_DELETE
+    global DELETE_TIMEOUT
+    global HELP_DELETE_TIMEOUT
+
+    assert TOKEN is not None or TOKEN != ""
+    assert PREFIX is not None or PREFIX != ""  
+    assert MAX_DELETE is not None or MAX_DELETE != "" 
+    assert DELETE_TIMEOUT is not None or DELETE_TIMEOUT != ""
+    assert HELP_DELETE_TIMEOUT is not None or HELP_DELETE_TIMEOUT != ""
+
+    try: 
+        MAX_DELETE = int(MAX_DELETE) 
+        DELETE_TIMEOUT = int(DELETE_TIMEOUT) 
+        HELP_DELETE_TIMEOUT = int(HELP_DELETE_TIMEOUT) 
+    except Exception as e: 
+        print(e)
+        exit()
 
 def is_me(m): 
     return m.author == bot.user
@@ -37,7 +52,7 @@ async def delete_by_emoji(ctx, args):
         #This should add messages newest first to a list (messages) starting with the first one to have a down arrow 
         # emoji reaction, it will keep adding until it reaches the up arrow emoji 
         deleting = False
-        async for message in ctx.channel.history(limit=250):
+        async for message in ctx.channel.history(limit=MAX_DELETE):
             if deleting:
                 await message.delete()
                 messages.append(message) 
@@ -93,7 +108,7 @@ async def on_ready():
 @bot.command()
 async def clear(ctx): 
     try: 
-        deleted_msgs = await ctx.channel.purge(limit=100) # TODO send this to a log file / audit file
+        deleted_msgs = await ctx.channel.purge(limit=MAX_DELETE) # TODO send this to a log file / audit file
         await ctx.send(f"Deleted {len(deleted_msgs)} messages.", delete_after=5)
     except discord.Forbidden:
         await ctx.send("I don't have permission to delete messages in this channel.", delete_after=5)
@@ -190,4 +205,5 @@ async def cowsay(ctx, *args):
         pass
 
 if __name__ == "__main__":
+    init()
     bot.run(TOKEN)
