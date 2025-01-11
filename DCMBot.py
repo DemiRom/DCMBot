@@ -10,8 +10,9 @@ load_dotenv(override=True)
 TOKEN = os.getenv('DISCORD_TOKEN')
 PREFIX = os.getenv('DISCORD_PREFIX')
 MAX_DELETE = os.getenv('DISCORD_MAX_DELETE')
-DELETE_TIMEOUT= os.getenv('DELETE_TIMEOUT')
-HELP_DELETE_TIMEOUT= os.getenv('HELP_DELETE_TIMEOUT')
+DELETE_TIMEOUT = os.getenv('DELETE_TIMEOUT')
+HELP_DELETE_TIMEOUT = os.getenv('HELP_DELETE_TIMEOUT')
+INTERACTION_ROLE = os.getenv('DISCORD_BOT_INTERACTION_ROLE')
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -27,6 +28,7 @@ def init():
     assert MAX_DELETE is not None or MAX_DELETE != "" 
     assert DELETE_TIMEOUT is not None or DELETE_TIMEOUT != ""
     assert HELP_DELETE_TIMEOUT is not None or HELP_DELETE_TIMEOUT != ""
+    assert INTERACTION_ROLE is not None or INTERACTION_ROLE != "" 
 
     try: 
         MAX_DELETE = int(MAX_DELETE) 
@@ -105,7 +107,11 @@ async def print_rm_help(ctx):
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
+###
+## Command routes
+### 
 @bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def clear(ctx): 
     try: 
         deleted_msgs = await ctx.channel.purge(limit=MAX_DELETE) # TODO send this to a log file / audit file
@@ -116,6 +122,7 @@ async def clear(ctx):
         print(f"An error occurred while trying to delete messages: {e}")
 
 @bot.command() 
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def echo(ctx, *args):
     try: 
         await ctx.message.delete()
@@ -133,6 +140,7 @@ async def echo(ctx, *args):
         print("An error has occured :kappa:")
 
 @bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def rm(ctx, *args):
     print(f'Args: {args}')
 
@@ -178,6 +186,7 @@ async def rm(ctx, *args):
         print(f"An error occurred while trying to delete messages: {e}")
 
 @bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def cowsay(ctx, *args): 
     try: 
         await ctx.message.delete()
