@@ -1,11 +1,10 @@
 import os
+import json 
 
-from github_webhook import Webhook
 from flask import Flask
 from dotenv import load_dotenv
 
 app = Flask(__name__)
-webhook = Webhook(__name__)
 
 load_dotenv()
 
@@ -15,16 +14,20 @@ ROOT_DIR = os.getenv('ROOT_DIR')
 def index(): 
     return "<html><h1>Nothing to see here!</h1></html>"
 
-@webhook.hook()
-def on_push(data): 
-    print("Got push with: {0}".format(data))
+@app.route("/update")
+def on_push(): 
+    print("Got push")
 
     # Stop the bot process
     os.system("systemctl stop dcmbot")
     # Pull latest changes
-    os.system(f"git -C {ROOT_DIR} pull origin main")
+    os.system(f"cd {ROOT_DIR} && git pull origin main")
+    # Update the requirements
+    os.system(f"cd {ROOT_DIR} && source .venv/bin/activate && pip3 install -r requirements.txt")
     # Start the bot process
     os.system("systemctl start dcmbot")
+
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
 
 if __name__ == "__main__": 
     app.run(host="0.0.0.0", port=80)
