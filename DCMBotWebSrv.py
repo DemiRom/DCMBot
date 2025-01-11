@@ -23,7 +23,7 @@ def on_push():
     # Pull latest changes
     os.system(f"cd {ROOT_DIR} && git pull origin main")
     # Update the requirements
-    os.system(f"cd {ROOT_DIR} && source .venv/bin/activate && pip3 install -r requirements.txt")
+    os.system(f"/bin/bash 'cd {ROOT_DIR} && source .venv/bin/activate && pip3 install -r requirements.txt'")
     # Start the bot process
     os.system("systemctl start dcmbot")
 
