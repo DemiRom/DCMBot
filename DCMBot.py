@@ -219,6 +219,41 @@ async def catgirl(ctx, *args):
         print(e)
 
 @bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) #TODO Move to slash commands due to error handling
+async def waifu(ctx, *args): 
+    try: 
+        await ctx.message.delete()
+        
+        r = requests.get("https://api.waifu.pics/nsfw/waifu") if args and args[0] == "nsfw" else requests.get("https://api.waifu.pics/sfw/waifu")
+
+        if r.status_code == 200: 
+            image_url = r.json()["url"]
+
+            image_request = requests.get(f"{image_url}")
+            
+            if image_request.status_code != 200: 
+                await ctx.send("Couldn't fetch your waifu image :'(", delete_after=DELETE_TIMEOUT)
+                return
+            
+            assert image_request.content is not None
+
+            with open("waifu.png", "wb") as f: 
+                f.write(image_request.content)
+
+            await ctx.send(file=discord.File("waifu.png"))
+
+            if os.path.exists("waifu.png"): 
+                os.remove("waifu.png")
+
+        else: 
+            await ctx.send("Couldn't fetch your waifu :(", delete_after=DELETE_TIMEOUT)
+    except discord.HTTPException as e:
+        print(f"An error occurred while trying to delete messages: {e}")
+    except Exception as e: 
+        print(e)
+
+
+@bot.command()
 @discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def cowsay(ctx, *args): 
     try: 
@@ -227,7 +262,7 @@ async def cowsay(ctx, *args):
         if not args: 
             await print_cowsay_help(ctx)
             return
-        
+
         text = " ".join(args)
         header = "_"*(len(text)+4)
         footer = "-"*(len(text)+4)
