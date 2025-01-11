@@ -186,8 +186,8 @@ async def cowsay(ctx, *args):
         {spaces}    (__)\\       )\\/\\
         {spaces}        ||----w |
         {spaces}        ||     ||```''')
-    except Exception as e: 
-        print(e)
+    except: 
+        pass
 
 if __name__ == "__main__":
     bot.run(TOKEN)
