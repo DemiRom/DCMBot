@@ -14,7 +14,7 @@ ROOT_DIR = os.getenv('ROOT_DIR')
 def index(): 
     return "<html><h1>Nothing to see here!</h1></html>"
 
-@app.route("/update")
+@app.route("/update", methods = ['GET', 'POST'])
 def on_push(): 
     print("Got push")
 
