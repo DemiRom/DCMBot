@@ -273,6 +273,17 @@ async def jesus(ctx, *args):
 
 @bot.command()
 @discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
+async def horny(ctx, *args): 
+    try: 
+        await ctx.message.delete()
+
+        await ctx.send(file=discord.File("assets/gifs/gotohornyjail.gif"))
+
+    except Exception as e: 
+        print(e)
+
+@bot.command()
+@discord.ext.commands.has_role(INTERACTION_ROLE) # TODO Move to slash commands due to error handling
 async def cowsay(ctx, *args): 
     try: 
         await ctx.message.delete()
