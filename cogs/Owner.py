@@ -1,4 +1,6 @@
+import os
 import discord
+
 from discord import app_commands
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -7,6 +9,32 @@ from discord.ext.commands import Context
 class Owner(commands.Cog, name="owner"):
     def __init__(self, client) -> None:
         self.client = client
+
+        self.DELETE_TIMEOUT = int(os.getenv("DELETE_TIMEOUT"))
+
+    @commands.command(
+            name="sendlog",
+            description="Sends the entire log to the user that calls the command"
+    )
+    @app_commands.describe(scope="Sends the entire log to the user that calls the command")
+    @commands.is_owner()
+    async def sendlog(self, ctx): 
+        try: 
+            await self.client.change_presence(activity=discord.Game("Thinking..."))
+            await ctx.send("Thinking...", delete_after=self.DELETE_TIMEOUT)
+
+            with open("discord.log", "r") as f: 
+                lines = f.readlines()
+                await ctx.author.send(f"```{"\n".join(lines)}```")
+
+        except discord.HTTPException as e:
+            await ctx.send(f"An error occurred while trying to delete messages")
+            self.client.logger.error(f"HTTP Exception: {e}")
+        except Exception as e: 
+            await ctx.send("A general error has occurred!")
+            self.client.logger.error(f"General error for SendLog {e}")
+
+        await self.client.change_presence(activity=None)
 
     @commands.command(
         name="sync",
