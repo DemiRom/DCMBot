@@ -9,9 +9,9 @@ class Rm(commands.Cog, name="rm"):
     def __init__(self, client): 
         self.client = client
 
-        self.DELETE_TIMEOUT = os.getenv("DELETE_TIMEOUT")
-        self.MAX_DELETE = os.getenv("DISCORD_MAX_DELETE")
-        self.HELP_DELETE_TIMEOUT = os.getenv("HELP_DELETE_TIMEOUT")
+        self.DELETE_TIMEOUT = int(os.getenv("DELETE_TIMEOUT"))
+        self.MAX_DELETE = int(os.getenv("DISCORD_MAX_DELETE"))
+        self.HELP_DELETE_TIMEOUT = int(os.getenv("HELP_DELETE_TIMEOUT"))
 
     async def delete_by_emoji(self, ctx, emoji: str) -> list[discord.Message]: 
         messages = []
@@ -46,28 +46,20 @@ class Rm(commands.Cog, name="rm"):
 
         return []
     
-    async def delete_by_user(ctx, user_id:str, count: int) -> list[discord.Message]: 
+    async def delete_by_user(self, ctx, user_id: str, count: int) -> list[discord.Message]: 
         try: 
-            username = await ctx.bot.fetch_user(user_id.strip("<@>"))
+            member = await ctx.bot.fetch_user(user_id)
 
-            return await ctx.channel.purge(limit=count, check=lambda m: m.author == username)
+            return await ctx.channel.purge(limit=count, check=lambda m: m.author == member)
+        except discord.NotFound: 
+            await ctx.send("User does not exist!")
         except Exception as e: 
-            print(f"Error: {e}")
+            raise e
         
         return [] 
-
-    @commands.hybrid_command(name="rm", description="Removes messages")
-    async def rm(self, ctx: Context, *, switch: str, emoji: str = None, count: int = 1, user: discord.User = None): 
-        try: 
-            messages = []   
-            if switch == "-e": 
-                messages = self.delete_by_emoji(ctx, emoji)
-            elif switch == "-c": 
-                messages = self.delete_by_count(ctx, count)
-            elif switch == "-u": 
-                messages = self.delete_by_user(ctx, user, count)
-            else:
-                await ctx.send(embed=discord.Embed(
+    
+    async def show_help(self, ctx): 
+        await ctx.send(embed=discord.Embed(
                     title=f"Usage: {os.getenv("DISCORD_PREFIX")}rm <args>",
                     description="This command will remove messages based on switch flags and arguments passed to the command!",
                     color=discord.Color.blue()
@@ -77,17 +69,47 @@ class Rm(commands.Cog, name="rm"):
                 .add_field(name="Delete By Username", value="rm -u @<user> <count>\n\nDeletes any number of messages up to the configured limit starting with the newest ones from a specific user!\n", inline=False)
 
                 , delete_after=self.HELP_DELETE_TIMEOUT)
+
+    @commands.hybrid_command(name="rm", description="Removes messages")
+    async def rm(self, ctx: Context, *, switch: str, emoji: str = None, count: int = 0, user: discord.User = None): 
+        try: 
+            messages = []   
+            await ctx.send("Deleting...", delete_after=self.DELETE_TIMEOUT)
+
+            if switch == "-e": 
+                if not emoji: 
+                    await self.show_help()
+                    return
+                
+                messages = await self.delete_by_emoji(ctx, emoji)
+            elif switch == "-c": 
+                if not count == 0 or count > self.MAX_DELETE or count < 0: 
+                    await self.show_help(ctx)
+                    return
+
+                messages = await self.delete_by_count(ctx, count)
+            elif switch == "-u":
+                if not user: 
+                    await self.show_help(ctx)
+                    return
+                
+                if count == 0 or count > self.MAX_DELETE or count < 0:
+                    count = self.MAX_DELETE
+
+                messages = await self.delete_by_user(ctx, user.id, count)
+            else:
+                await self.show_help(ctx)
                 return
 
             await ctx.send(f"Deleted {len(messages)} messages!", delete_after=self.DELETE_TIMEOUT)
 
-
-        except Exception as e: 
-            print(f"An error has occured {e}")
         except discord.Forbidden:
             await ctx.send("I don't have permission to delete messages in this channel.", delete_after=DELETE_TIMEOUT)
         except discord.HTTPException as e:
-            print(f"An error occurred while trying to delete messages: {e}")
+            await ctx.send(f"An error occurred while trying to delete messages")
+        except Exception as e: 
+            print(f"A general error occured while trying to delete users messages {e}")
+            await ctx.send(f"A general error occurred while trying to delete messages")
 
 async def setup(client: commands.Bot): 
     await client.add_cog(Rm(client))
