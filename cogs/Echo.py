@@ -1,3 +1,4 @@
+import os
 import discord
 
 from discord import app_commands
@@ -8,24 +9,18 @@ class Echo(commands.Cog, name="echo"):
     def __init__(self, client): 
         self.client = client
 
-    @commands.hybrid_command(name="echo", descrtion="Echo the users input")
-    async def echo(self, ctx: Context, *, text: str, optional: int = 0): 
-        await ctx.send(f"{ctx.message.content}")
+    @commands.hybrid_command(name="echo", description="Echo the users input")
+    async def echo(self, ctx: Context, *, text: str): 
         try:   
-            # if not args: 
-            #     await ctx.send(embed=discord.Embed(
-            #         title=f"Usage: {PREFIX}echo <text to echo>",
-            #         description="This command will just echo back whatever you put as an argument!",
-            #         color=discord.Color.blue()
-            #     ), delete_after=10)
-            #     return
-            print(ctx)
-            print(text)
-
             if text != "":
-                await ctx.send(f"Something something: {text}") 
+                await ctx.send(text) 
             else: 
-                print("NO ARGS")
+                await ctx.send(embed=discord.Embed(
+                    title=f"Usage: /echo <text to echo>",
+                    description="This command will just echo back whatever you put as an argument!",
+                    color=discord.Color.blue()
+                ), delete_after=os.getenv("HELP_DELETE_TIMEOUT"))
+                return
         except Exception as e: 
             print(f"An error has occured {e}")
 

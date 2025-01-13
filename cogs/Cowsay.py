@@ -1,3 +1,4 @@
+import os
 import discord
 
 from discord import app_commands
@@ -8,19 +9,32 @@ class Cowsay(commands.Cog):
     def __init__(self, client): 
         self.client = client
 
-    @commands.hybrid_command(name="cowsay", descrtion="Prints ascii art of a cow with a speech bubble")
-    async def Cowsay(self, ctx): 
-        # await ctx.message.delete()
+    @commands.hybrid_command(name="cowsay", description="Prints ascii art of a cow with a speech bubble")
+    async def Cowsay(self, ctx, *, text: str): 
         try:   
-            # if not args: 
-            #     await ctx.send(embed=discord.Embed(
-            #         title=f"Usage: {PREFIX}echo <text to echo>",
-            #         description="This command will just echo back whatever you put as an argument!",
-            #         color=discord.Color.blue()
-            #     ), delete_after=10)
-            #     return
+            if not text: 
+                await ctx.send(embed=discord.Embed(
+                    title=f"Usage: cowsay <text>",
+                    description="Draws a pretty picture of a cow with text",
+                    color=discord.Color.blue()
+                ), delete_after=os.getenv("HELP_DELETE_TIMEOUT"))
+                return
 
-            await ctx.send("Cow says moo") 
+            header = "_"*(len(text)+4)
+            footer = "-"*(len(text)+4)
+            spaces = " "*(len(text)+4)
+
+            await ctx.send(f'''```
+            {header} 
+            < {text} >  
+            {footer} 
+            {spaces}\\ 
+            {spaces}\\   ^__^  
+            {spaces}\\  (oo)\\_______
+            {spaces}    (__)\\       )\\/\\
+            {spaces}        ||----w |
+            {spaces}        ||     ||```''')
+
         except Exception as e: 
             print(f"An error has occured {e}")
 
