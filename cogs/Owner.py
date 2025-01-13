@@ -176,36 +176,5 @@ class Owner(commands.Cog, name="owner"):
         await context.send(embed=embed)
         await self.client.close()
 
-    @commands.hybrid_command(
-        name="say",
-        description="The client will say anything you want.",
-    )
-    @app_commands.describe(message="The message that should be repeated by the client")
-    @commands.is_owner()
-    async def say(self, context: Context, *, message: str) -> None:
-        """
-        The client will say anything you want.
-
-        :param context: The hybrid command context.
-        :param message: The message that should be repeated by the client.
-        """
-        await context.send(message)
-
-    @commands.hybrid_command(
-        name="embed",
-        description="The client will say anything you want, but within embeds.",
-    )
-    @app_commands.describe(message="The message that should be repeated by the client")
-    @commands.is_owner()
-    async def embed(self, context: Context, *, message: str) -> None:
-        """
-        The client will say anything you want, but using embeds.
-
-        :param context: The hybrid command context.
-        :param message: The message that should be repeated by the client.
-        """
-        embed = discord.Embed(description=message, color=0xBEBEFE)
-        await context.send(embed=embed)
-
 async def setup(client) -> None:
     await client.add_cog(Owner(client))

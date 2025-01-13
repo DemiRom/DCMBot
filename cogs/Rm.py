@@ -40,12 +40,11 @@ class Rm(commands.Cog, name="rm"):
 
     async def delete_by_count(self, ctx, count: int) -> list[discord.Message]: 
         try: 
-            return await ctx.channel.purge(limit=count)
-        except: 
-            pass
+            # Count + 1 because it will delete the last bot message without deleting the previous message as intended
+            return await ctx.channel.purge(limit=count + 1)
+        except Exception as e: 
+            raise e
 
-        return []
-    
     async def delete_by_user(self, ctx, user_id: str, count: int) -> list[discord.Message]: 
         try: 
             member = await ctx.bot.fetch_user(user_id)
@@ -74,6 +73,7 @@ class Rm(commands.Cog, name="rm"):
     async def rm(self, ctx: Context, *, switch: str, emoji: str = None, count: int = 0, user: discord.User = None): 
         try: 
             messages = []   
+            await self.client.change_presence(activity=discord.Game("Thinking..."))
             await ctx.send("Deleting...", delete_after=self.DELETE_TIMEOUT)
 
             if switch == "-e": 
@@ -83,11 +83,16 @@ class Rm(commands.Cog, name="rm"):
                 
                 messages = await self.delete_by_emoji(ctx, emoji)
             elif switch == "-c": 
-                if not count == 0 or count > self.MAX_DELETE or count < 0: 
+                if count == 0 or count > self.MAX_DELETE or count < 0: 
                     await self.show_help(ctx)
                     return
 
                 messages = await self.delete_by_count(ctx, count)
+
+                # all elements except the first one to have an accurate deleted message count.
+                assert len(messages) > 1
+                messages = messages[1:]
+
             elif switch == "-u":
                 if not user: 
                     await self.show_help(ctx)
@@ -104,12 +109,16 @@ class Rm(commands.Cog, name="rm"):
             await ctx.send(f"Deleted {len(messages)} messages!", delete_after=self.DELETE_TIMEOUT)
 
         except discord.Forbidden:
-            await ctx.send("I don't have permission to delete messages in this channel.", delete_after=DELETE_TIMEOUT)
+            self.client.logger.error("Permission denied!")
+            await ctx.send("I don't have permission to delete messages in this channel.", delete_after=self.DELETE_TIMEOUT)
         except discord.HTTPException as e:
+            self.client.logger.error(f"An error occurred while trying to delete messages {e}")
             await ctx.send(f"An error occurred while trying to delete messages")
         except Exception as e: 
-            print(f"A general error occured while trying to delete users messages {e}")
+            self.client.logger.error(f"A general error occured while trying to delete users messages {e}")
             await ctx.send(f"A general error occurred while trying to delete messages")
+
+        await self.client.change_presence(activity=None)
 
 async def setup(client: commands.Bot): 
     await client.add_cog(Rm(client))

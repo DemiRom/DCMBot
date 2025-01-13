@@ -22,7 +22,7 @@ class Echo(commands.Cog, name="echo"):
                 ), delete_after=os.getenv("HELP_DELETE_TIMEOUT"))
                 return
         except Exception as e: 
-            print(f"An error has occured {e}")
+            self.client.logger.error(f"A general error has occured {e}")
 
 async def setup(client: commands.Bot): 
     await client.add_cog(Echo(client))

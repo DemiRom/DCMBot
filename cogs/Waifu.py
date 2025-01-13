@@ -11,13 +11,14 @@ class Waifu(commands.Cog):
         self.client = client
 
         #Load env vars
-        self.DELETE_TIMEOUT = os.getenv("DELETE_TIMEOUT")
+        self.DELETE_TIMEOUT = int(os.getenv("DELETE_TIMEOUT"))
 
     @commands.hybrid_command(name="waifu", description="Posts a picture of a waifu nsfw selectable")
-    async def Waifu(self, ctx, *, nsfw: bool): 
+    async def waifu(self, ctx, *, nsfw: bool): 
         try: 
-            await ctx.message.delete()
-            
+            await self.client.change_presence(activity=discord.Game("Thinking..."))
+            await ctx.send("Thinking...", delete_after=self.DELETE_TIMEOUT)
+
             r = requests.get("https://api.waifu.pics/nsfw/waifu") if nsfw else requests.get("https://api.waifu.pics/sfw/waifu")
 
             if r.status_code == 200: 
@@ -27,13 +28,17 @@ class Waifu(commands.Cog):
 
                 if os.path.exists("waifu.png"): 
                     os.remove("waifu.png")
-
             else: 
                 await ctx.send("Couldn't fetch your waifu :(", delete_after=self.DELETE_TIMEOUT)
         except discord.HTTPException as e:
-            print(f"An error occurred while trying to delete messages: {e}")
+            self.client.logger.error("An error occurred while trying to delete messages: {e}")
+            await ctx.send(f"An error occurred while trying to delete messages: {e}")
         except Exception as e: 
-            print(e)
+            self.client.logger.error(f"A general error has occurred {e}")
+            await ctx.send("General error has occurred")
+
+        await self.client.change_presence(activity=None)
+
 
 async def setup(client: commands.Bot): 
     await client.add_cog(Waifu(client))

@@ -9,15 +9,21 @@ class Cowsay(commands.Cog):
     def __init__(self, client): 
         self.client = client
 
+        self.HELP_DELETE_TIMEOUT = int(os.getenv("HELP_DELETE_TIMEOUT"))
+        self.DELETE_TIMEOUT = int(os.getenv("DELETE_TIMEOUT"))
+
     @commands.hybrid_command(name="cowsay", description="Prints ascii art of a cow with a speech bubble")
     async def Cowsay(self, ctx, *, text: str): 
         try:   
+            await self.client.change_presence(activity=discord.Game("Thinking..."))
+            await ctx.send("Thinking...", delete_after=self.DELETE_TIMEOUT)
+
             if not text: 
                 await ctx.send(embed=discord.Embed(
                     title=f"Usage: cowsay <text>",
                     description="Draws a pretty picture of a cow with text",
                     color=discord.Color.blue()
-                ), delete_after=os.getenv("HELP_DELETE_TIMEOUT"))
+                ), delete_after=self.HELP_DELETE_TIMEOUT)
                 return
 
             header = "_"*(len(text)+4)
@@ -36,7 +42,11 @@ class Cowsay(commands.Cog):
             {spaces}        ||     ||```''')
 
         except Exception as e: 
-            print(f"An error has occured {e}")
+            await ctx.send("A general error occurred", delete_afer=self.DELETE_TIMEOUT)
+            self.client.logger.erro(f"A general error has occured {e}")
+
+        await self.client.change_presence(activity=None)
+
 
 async def setup(client: commands.Bot): 
     await client.add_cog(Cowsay(client))

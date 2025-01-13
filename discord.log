@@ -1,15 +1,17 @@
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Logged in as DCMBot_Develop
-[2025-01-12 23:19:11] [INFO    ] discord_bot: discord.py API version: 2.4.0
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Python version: 3.13.1
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Running on: Darwin 24.2.0 (posix)
-[2025-01-12 23:19:11] [INFO    ] discord_bot: -------------------
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Catgirl'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Clear'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Cowsay'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Waifu'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Owner'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Rm'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Jesus'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Echo'
-[2025-01-12 23:19:11] [INFO    ] discord_bot: Loaded extension 'Horny'
-[2025-01-12 23:19:24] [INFO    ] discord_bot: Executed rm command in DemiLovato's Bot Development Server (ID: 774816524333613097) by demilovato (ID: 126081837125730305)
+[2025-01-13 00:28:28] [INFO    ] discord_bot: Logged in as DCMBot_Develop
+[2025-01-13 00:28:28] [INFO    ] discord_bot: discord.py API version: 2.4.0
+[2025-01-13 00:28:28] [INFO    ] discord_bot: Python version: 3.13.1
+[2025-01-13 00:28:28] [INFO    ] discord_bot: Running on: Darwin 24.2.0 (posix)
+[2025-01-13 00:28:28] [INFO    ] discord_bot: -------------------
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Catgirl'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Clear'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Cowsay'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Waifu'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'SendLog'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Owner'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Rm'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Jesus'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Echo'
+[2025-01-13 00:28:29] [INFO    ] discord_bot: Loaded extension 'Horny'
+[2025-01-13 00:28:33] [INFO    ] discord_bot: Executed sendlog command in DemiLovato's Bot Development Server (ID: 774816524333613097) by demilovato (ID: 126081837125730305)
+[2025-01-13 00:28:49] [INFO    ] discord_bot: Executed clear command in DemiLovato's Bot Development Server (ID: 774816524333613097) by demilovato (ID: 126081837125730305)
