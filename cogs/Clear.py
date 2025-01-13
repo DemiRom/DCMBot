@@ -18,8 +18,12 @@ class Clear(commands.Cog):
             await self.client.change_presence(activity=discord.Game("Thinking..."))
             await ctx.send("Deleting...", delete_after=self.DELETE_TIMEOUT)
 
-            deleted_msgs = await ctx.channel.purge(limit=self.MAX_DELETE) 
-            await ctx.send(f"Deleted {len(deleted_msgs)} messages.", delete_after=self.DELETE_TIMEOUT)
+            messages = await ctx.channel.purge(limit=self.MAX_DELETE) 
+            
+            for message in messages: 
+                self.client.logger.info(f"Deleted: {message.content} from Display Name: {message.author.display_name} id: {message.author.id} UTC: {message.created_at}")
+            
+            await ctx.send(f"Deleted {len(messages)} messages.", delete_after=self.DELETE_TIMEOUT)
 
         except discord.Forbidden as e:
             await ctx.send("I don't have permission to delete messages in this channel.", delete_after=self.DELETE_TIMEOUT)

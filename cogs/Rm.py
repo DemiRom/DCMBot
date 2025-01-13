@@ -82,6 +82,7 @@ class Rm(commands.Cog, name="rm"):
                     return
                 
                 messages = await self.delete_by_emoji(ctx, emoji)
+
             elif switch == "-c": 
                 if count == 0 or count > self.MAX_DELETE or count < 0: 
                     await self.show_help(ctx)
@@ -108,12 +109,17 @@ class Rm(commands.Cog, name="rm"):
 
             await ctx.send(f"Deleted {len(messages)} messages!", delete_after=self.DELETE_TIMEOUT)
 
+            for message in messages: 
+                self.client.logger.info(f"Deleted: {message.content} from Display Name: {message.author.display_name} id: {message.author.id} UTC: {message.created_at}")
+            
         except discord.Forbidden:
             self.client.logger.error("Permission denied!")
             await ctx.send("I don't have permission to delete messages in this channel.", delete_after=self.DELETE_TIMEOUT)
+
         except discord.HTTPException as e:
             self.client.logger.error(f"An error occurred while trying to delete messages {e}")
             await ctx.send(f"An error occurred while trying to delete messages")
+
         except Exception as e: 
             self.client.logger.error(f"A general error occured while trying to delete users messages {e}")
             await ctx.send(f"A general error occurred while trying to delete messages")
